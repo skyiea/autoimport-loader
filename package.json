@@ -1,0 +1,33 @@
+{
+  "name": "autoimport-loader",
+  "version": "0.0.2",
+  "description": "Autoimport loader for webpack",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyiea/autoimport-loader.git"
+  },
+  "keywords": [
+    "webpack",
+    "loader",
+    "import",
+    "imports",
+    "es6"
+  ],
+  "author": "Sergiy Murygin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skyiea/autoimport-loader/issues"
+  },
+  "homepage": "https://github.com/skyiea/autoimport-loader#readme",
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "loader-utils": "^0.2.11"
+  },
+  "devDependencies": {
+    "babel": "^5.8.29"
+  }
+}
