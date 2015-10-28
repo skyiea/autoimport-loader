@@ -20,9 +20,13 @@ export default function (content) {
             prop_name = name.match(destruct_regex).pop();
         }
 
-        if (!(new RegExp('^import\\s+' + name)).test(content) &&
-                !(new RegExp('^import.+from\\s+"|\'react"|\';*$')).test(content) &&
-                (!prop_name || !(new RegExp('^import\\s+\{\\s*' + prop_name + '\\s*\}')).test(content))) {
+        if (!(new RegExp([
+                    `(^import\\s+${name})`,
+                    `(^import.+from\\s+"|\'${path}"|\';*$)`,
+                    `(^import\\s+\{\\s*${prop_name}\\s*})`,
+                    `((var|let|const)+\\s+${name}\\b)`,
+                    `((var|let|const)+\\s+${prop_name}\\b)`
+                ].join('|'))).test(content)) {
             imports.push(`import ${name} from "${path}";`);
         }
     });
