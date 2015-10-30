@@ -1,6 +1,6 @@
 {
   "name": "autoimport-loader",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Autoimport loader for webpack",
   "main": "lib/index.js",
   "repository": {
