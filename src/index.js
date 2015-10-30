@@ -64,9 +64,7 @@ export default function (content) {
                 )).test(content);
             } else {
                 if (var_name === '$') {
-                    valid = (new RegExp(
-                        '\\$'
-                    )).test(content);
+                    valid = /\$((\.)|(\())/.test(content);
                 } else {
                     valid = (new RegExp(
                         `\\${var_name}\\b`
