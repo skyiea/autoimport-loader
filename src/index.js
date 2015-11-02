@@ -49,7 +49,7 @@ export default function (content) {
             valid = !(new RegExp([
                 `(import\\s+${var_name})`,
                 `(import\\s+\{\\s*${var_name}\\s*})`,
-                `((var|let|const!function)+\\s+${var_name}\\b)`
+                `((var|let|const|function)+\\s+${var_name}\\b)`
             ].join('|'))).test(content);
 
             debug && !valid && console.log(`### VAR DECLARATION EXISTS. EXITING..`);
