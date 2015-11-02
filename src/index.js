@@ -57,7 +57,7 @@ export default function (content) {
 
         if (valid && !allowSameImport) {
             valid = !(new RegExp(
-                `import.+from\\s+"|\'${path}"|\';*$`
+                `import.+from\\s+("|\')${path}("|\');*$`
             )).test(content);
 
             debug && !valid && console.log(`### SUCH IMPORT PATH ALREADY EXISTS. EXITING..`);
@@ -84,7 +84,7 @@ export default function (content) {
         if (valid) {
             debug && console.log(`### PUTTING IMPORT: import ${inputName} from "${path}";`);
 
-            imports.push(`import ${inputName} from "${path}";`);
+            imports.push(`import ${inputName} from '${path}';`);
         }
 
         debug && console.log(`####################`);
