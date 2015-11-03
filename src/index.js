@@ -12,36 +12,39 @@ export default function (content) {
         config[option] = true;
     }
 
-    const { allowOverride = false, allowSameImport = false, checkIfUsed = false,
-            debug = false } = config;
+    const { allowOverride = false, disallowSameImport = false, checkIfUsed = false } = config;
     const imports = [];
-
-    debug && console.log(`### MODULE CONTENT:\n${content}`);
 
     Object.keys(modules).forEach(inputName => {
         let dontCheckUsage = false;
+        let isCustomPackage = false;
         let path = modules[inputName];
+        let modifier = path[0];
 
-        if (path[0] === '>') {
-            dontCheckUsage = true;
-            path = path.slice(1);
+        switch (modifier) {
+            case '>':
+                dontCheckUsage = true;
+                path = path.slice(1);
+                break;
+            case '<':
+                isCustomPackage = true;
+                path = path.slice(1);
+                break;
+            default:
         }
 
-        const destruct_regex = /\{\s*([a-zA-Z]+)\s*}/;
-        const is_destr_name = destruct_regex.test(inputName);
+        const destructRegex = /\{\s*([a-zA-Z]+)\s*}/;
+        const isDestructingVar = destructRegex.test(inputName);
 
-        let var_name = is_destr_name ?
-                inputName.match(destruct_regex).pop() :
+        let var_name = isDestructingVar ?
+                inputName.match(destructRegex).pop() :
                 inputName;
 
         if (path === true) {
             path = var_name;
         }
 
-        debug && console.log(`####################`);
-        debug && console.log(`### INPUT_NAME: ${inputName}`);
-        debug && console.log(`### VAR_NAME: ${var_name}`);
-        debug && console.log(`### PATH: ${path}`);
+        const resultingStr = `import ${inputName} from '${path}';`;
 
         let valid = true;
 
@@ -52,15 +55,17 @@ export default function (content) {
                 `((var|let|const|function)+\\s+${var_name}\\b)`
             ].join('|'))).test(content);
 
-            debug && !valid && console.log(`### VAR DECLARATION EXISTS. EXITING..`);
+            !valid && !isCustomPackage &&
+                this.emitWarning(`"${var_name}" variable is already used. Import won't be added.`);
         }
 
-        if (valid && !allowSameImport) {
+        if (valid && disallowSameImport) {
             valid = !(new RegExp(
-                `import.+from\\s+("|\')${path}("|\');*$`
+                `import.+from\\s+("|\')${path}("|\');*`
             )).test(content);
 
-            debug && !valid && console.log(`### SUCH IMPORT PATH ALREADY EXISTS. EXITING..`);
+            !valid &&
+                this.emitWarning(`"${path}" path is already used. Import won't be added.`);
         }
 
         if (valid && checkIfUsed && !dontCheckUsage) {
@@ -77,17 +82,11 @@ export default function (content) {
                     )).test(content);
                 }
             }
-
-            debug && !valid && console.log(`### VAR NOT USED. EXITING..`);
         }
 
         if (valid) {
-            debug && console.log(`### PUTTING IMPORT: import ${inputName} from "${path}";`);
-
-            imports.push(`import ${inputName} from '${path}';`);
+            imports.push(resultingStr);
         }
-
-        debug && console.log(`####################`);
     });
 
     return imports.join('\n') + '\n\n' + content;
